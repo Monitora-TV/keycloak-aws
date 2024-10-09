@@ -1,13 +1,15 @@
+# README
 
-# keycloak-aws
+## Guia Completo para Implantar o Keycloak na Nuvem para Gerenciamento de Acesso ao Aplicativo Monitora TV
 
- Guia Completo para Implantar o Keycloak na Nuvem para gerenciamento de acesso ao aplicativo Monitora TV.
- 
- Keycloak é uma solução de gerenciamento de identidade e acesso de código aberto.
- 
- https://www.keycloak.org/
- 
- 
+### keycloak-aws
+Keycloak é uma solução de gerenciamento de identidade e acesso de código aberto. [Saiba mais](https://www.keycloak.org/).
+
+## Pré-requisitos
+- Uma conta em um provedor de serviço na nuvem (ex: AWS).
+- Um domínio registrado.
+- Conhecimentos básicos em AWS e gerenciamento de servidores.
+
 ## 1 - Instalação da Infraestrutura
 
 ### AWS VPC - Criar VPC
@@ -272,7 +274,9 @@ sudo nginx -s reload
 
 2. Client: `localhost-dev`
    - Client ID: `localhost-dev`
-   - Nome: `Client localhost`
+  
+
+ - Nome: `Client localhost`
    - URL raiz: `http://localhost`
    - URL inicial: `http://localhost`
    - URIs de redirecionamento válidas: `http://localhost/*`
@@ -281,5 +285,3 @@ sudo nginx -s reload
      - Standard flow
      - Direct access grants
      - Implicit flow
-```
- 
