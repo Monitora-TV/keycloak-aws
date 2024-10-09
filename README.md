@@ -1,4 +1,5 @@
-# Guia Completo para Implantar o Keycloak na Nuvem para Gerenciamento de Acesso ao Aplicativo Monitora TV
+# Guia Completo para Implantar o Keycloak na Nuvem 
+O keycloak será utilizado para o Gerenciamento de Acesso ao Aplicativo Monitora TV.
 
 ### keycloak-aws
 Keycloak é uma solução de gerenciamento de identidade e acesso de código aberto. [Saiba mais](https://www.keycloak.org/).
