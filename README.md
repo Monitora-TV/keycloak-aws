@@ -5,6 +5,10 @@
 ### keycloak-aws
 Keycloak é uma solução de gerenciamento de identidade e acesso de código aberto. [Saiba mais](https://www.keycloak.org/).
 
+## Referencia
+Configurando AWS EC2: PostgreSQL, Keycloak y NGINX.
+https://www.youtube.com/watch?v=ErpFhcHsEXc&list=PLlYjHWCxjWmApyeC9KZa9m8otfcJi9-NQ&index=5
+
 ## Pré-requisitos
 - Uma conta em um provedor de serviço na nuvem (ex: AWS).
 - Um domínio registrado.
