@@ -304,3 +304,7 @@ Homologação: https://monitoratv.gustavokanashiro.com
      - Standard flow
      - Direct access grants
  
+ 
+### Configurar Keycloak 
+O video abaixo explica como criar realm, client, usuários entre outras funcionalidades do keycloak.
+https://www.youtube.com/playlist?list=PL-XEb3GK7JUrzMDzRAiRG-AV8iP73FF8
