@@ -5,8 +5,8 @@ O keycloak será utilizado para o Gerenciamento de Acesso ao Aplicativo Monitora
 Keycloak é uma solução de gerenciamento de identidade e acesso de código aberto. [Saiba mais](https://www.keycloak.org/).
 
 ## Referencia
-Configurando AWS EC2: PostgreSQL, Keycloak y NGINX.
-https://www.youtube.com/watch?v=ErpFhcHsEXc&list=PLlYjHWCxjWmApyeC9KZa9m8otfcJi9-NQ&index=5
+Configurando AWS EC2: PostgreSQL, Keycloak y NGINX. [Ver video](https://www.youtube.com/watch?v=ErpFhcHsEXc&list=PLlYjHWCxjWmApyeC9KZa9m8otfcJi9-NQ&index=5/).
+
 
 ## Pré-requisitos
 - Uma conta em um provedor de serviço na nuvem (ex: AWS).
@@ -16,9 +16,10 @@ https://www.youtube.com/watch?v=ErpFhcHsEXc&list=PLlYjHWCxjWmApyeC9KZa9m8otfcJi9
 ## 1 - Instalação da Infraestrutura
 
 ### AWS VPC - Criar VPC
+Amazon Virtual Private Cloud [Saiba mais](https://aws.amazon.com/pt/vpc/). 
 
 ### Criar Subnet
-- Uma pública e outra privada.
+- Uma pública(Acesso ao keycloak e ao Monitora TV frontend) e outra privada(acesso privado ao backend).
 
 ### Criar Instância EC2
 - Nome: `monitoratv-public`
@@ -29,29 +30,30 @@ https://www.youtube.com/watch?v=ErpFhcHsEXc&list=PLlYjHWCxjWmApyeC9KZa9m8otfcJi9
 - Regras de entrada: configurar de acordo com os requisitos.
 
 ### Criar IP Elástico
-- IP: `54.160.74.79`
+- IP: `<IP elastico criado>`
 - Alocar o IP elástico à instância criada (`monitoratv-public`).
 
 ### Route 53 - Criar Subdomínio
 1. Acessar Route 53 > Hosted Zone > `<dominio>.com`
-2. Criar registro `keycloak.<dominio>.com` do tipo "A" e definir o valor da rota como o IP elástico `54.160.74.79`.
+2. Criar registro `keycloak.<dominio>.com` do tipo "A" e definir o valor da rota como o IP elástico `<IP elastico criado>`.
 
 ## 2 - Criar Banco de Dados
 1. Acessar AWS RDS > Criar banco de dados > Postgres.
-   - Identificador da instância DB: `dev-postgres-db`
+   - Identificador da instância DB: `<nome da instancia>`
    - Nome de usuário: `postgres`
    - Grupo de segurança: `postgres-sg`
    - Selecionar t3 gratuito.
    - Armazenamento: 20 GB.
+2. Criar banco de dados "keyclaok", a estrutura inicial do banco será criada na primera compilação do Keycloak.
 
 ## 3 - Configurar Keycloak
 
 ### Atualizar Instância `monitoratv-public`
 1. Acessar a instância:
    ```bash
-   ssh -i "dev-key-01.pem" ubuntu@54.160.74.79
-   chmod 400 "dev-key-01.pem"
-   ssh -i "dev-key-01.pem" ubuntu@54.160.74.79
+   ssh -i "<sua-chave.pem>" ubuntu@<IP elastico criado>
+   chmod 400 "<sua-chave.pem>"
+   ssh -i "<sua-chave.pem>" ubuntu@<IP elastico criado>
    ```
 2. Atualizar pacotes:
    ```bash
@@ -82,12 +84,12 @@ sudo chmod -R o+x /opt/keycloak/bin/
    ```bash
    sudo nano /opt/keycloak/conf/keycloak.conf
    ```
-   - Configurações relevantes:
+   - Configurações conectar e criar estrutura do banco:
      ```properties
      db=postgres
      db-username=postgres
-     db-password=h6KX6acUP3yi49EQDj39
-     db-url=jdbc:postgresql://database-dev-01.cq1jlpb2yi6v.us-east-1.rds.amazonaws.com:5432/keycloak
+     db-password=<password>
+     db-url=jdbc:postgresql://<Endpoint-aws>:5432/keycloak
      hostname=keycloak.<dominio>.com
      http-port=8080
      http-relative-path=/auth
@@ -102,13 +104,15 @@ sudo chmod -R o+x /opt/keycloak/bin/
      - TCP 80 (0.0.0.0/0)
 
 ### Executar Keycloak pela Primeira Vez
+A primeira compilação "build" vai gerar a estrutura inicial do banco de dados "Keycloak".
+
 ```bash
 sudo /opt/keycloak/bin/kc.sh build
 ```
 - Configurar variáveis de ambiente:
 ```bash
 export KEYCLOAK_ADMIN=admin
-export KEYCLOAK_ADMIN_PASSWORD=admin@102030
+export KEYCLOAK_ADMIN_PASSWORD=admin@xxxxxx
 ```
 - Executar em modo de desenvolvimento:
 ```bash
@@ -170,6 +174,7 @@ sudo certbot certonly --standalone --preferred-challenges http -d keycloak.<domi
 
 ### Referenciar Certificado no Keycloak
 1. Editar arquivo de configuração do Keycloak:
+Exemplo: conf/keycloak.conf
 ```bash
 sudo nano /opt/keycloak/conf/keycloak.conf
 ```
@@ -206,7 +211,7 @@ sudo systemctl restart keycloak
 ### Testar Acesso
 - URL: `https://keycloak.<dominio>.com/auth/admin/master/console/`
 - Usuário: `admin`
-- Senha: `admin@102030`
+- Senha: `xxxxxx`
 
 ## 4 - Instalar Nginx
 1. Instalar Nginx na EC2 pública:
@@ -218,6 +223,8 @@ sudo systemctl status nginx
 
 ### Configurar Nginx
 1. Editar configuração:
+Exemplo: conf/nginx.conf
+
 ```bash
 sudo nano /etc/nginx/nginx.conf
 ```
@@ -254,7 +261,14 @@ sudo nginx -s reload
 1. Acessar Keycloak:
 - URL: `https://keycloak.<dominio>.com/auth`
 - Usuário: `admin`
+- Senha: `xxxxx`
+
+
+Homologação: https://monitoratv.gustavokanashiro.com
+- URL: `https://keycloak.<dominio>.com/auth`
+- Usuário: `admin`
 - Senha: `admin@102030`
+
 
 ### Criar Realm
 - Nome: `monitoratv`
@@ -268,18 +282,9 @@ sudo nginx -s reload
 - Senha: `102030`
 
 ### Criar Client
-1. Client: `backend-monitoratv`
-   - Autenticação do cliente: Ativado.
-   - Fluxos de autenticação: 
-     - Standard flow
-     - Direct access grants
-     - Implicit flow
-
-2. Client: `localhost-dev`
+1. Client: `localhost-dev`
    - Client ID: `localhost-dev`
-  
-
- - Nome: `Client localhost`
+   - Nome: `Client localhost para ambiente de desenvolvimento`
    - URL raiz: `http://localhost`
    - URL inicial: `http://localhost`
    - URIs de redirecionamento válidas: `http://localhost/*`
@@ -287,4 +292,15 @@ sudo nginx -s reload
    - Fluxos de autenticação: 
      - Standard flow
      - Direct access grants
-     - Implicit flow
+
+
+2. Client: `frontend-monitoratv`
+   - Client ID: `frontend-monitoratv`
+   - Nome: `Client para ambiente de produção`
+   - URIs de redirecionamento válidas: `https://monitoratv.gustavokanashiro.com/*`
+   - Web Origrns: `https://monitoratv.gustavokanashiro.com/*`
+   - Autenticação do cliente: Ativado.
+   - Fluxos de autenticação: 
+     - Standard flow
+     - Direct access grants
+ 
