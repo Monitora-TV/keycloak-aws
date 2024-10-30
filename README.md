@@ -90,7 +90,6 @@ sudo chmod -R o+x /opt/keycloak/bin/
      db-username=postgres
      db-password=<password>
      db-url=jdbc:postgresql://<Endpoint-aws>:5432/keycloak
-     hostname=keycloak.<dominio>.com
      http-port=8080
      http-relative-path=/auth
      ```
@@ -129,38 +128,6 @@ sudo -E /opt/keycloak/bin/kc.sh start-dev
 update keycloak.public.realm set ssl_required = 'NONE' where "name"='master';
 ```
 
-### Criar Serviço Keycloak
-1. Criar arquivo de serviço:
-   ```bash
-   sudo nano /etc/systemd/system/keycloak.service
-   ```
-   - Conteúdo:
-     ```ini
-     [Unit]
-     Description=The Keycloak server
-     After=syslog.target network.target
-     Before=httpd.service
-
-     [Service]
-     User=keycloak
-     Group=keycloak
-     SuccessExitStatus=0 143
-     ExecStart=/opt/keycloak/bin/kc.sh start-dev
-     ExecStop=/opt/keycloak/bin/kc.sh stop
-     Restart=always
-     RestartSec=3
-
-     [Install]
-     WantedBy=multi-user.target
-     ```
-
-2. Testar:
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable keycloak
-sudo systemctl start keycloak
-sudo systemctl status keycloak
-```
 
 ### Criar Certificado Keycloak
 1. Instalar Certbot:
@@ -192,17 +159,39 @@ sudo nano /opt/keycloak/conf/keycloak.conf
 sudo /opt/keycloak/bin/kc.sh build
 ```
 
-### Alterar Serviço para Modo Produção
-1. Editar serviço:
+
+### Criar Serviço Keycloak
+1. Criar arquivo de serviço:
+
 ```bash
 sudo nano /etc/systemd/system/keycloak.service
 ```
-   - Mudar `ExecStart` para:
-     ```bash
-     ExecStart=/opt/keycloak/bin/kc.sh start
-     ```
+[Unit]
+Description=The Keycloak server
+After=syslog.target network.target
+Before=httpd.service
 
-2. Aplicar alterações:
+[Service]
+User=keycloak
+Group=keycloak
+SuccessExitStatus=0 143
+ExecStart=!/opt/keycloak/bin/kc.sh start
+ExecStop=/opt/keycloak/bin/kc.sh stop
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target	 
+	 
+2. Testar:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable keycloak
+sudo systemctl start keycloak
+sudo systemctl status keycloak
+```
+
+3. Aplicar alterações:
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl restart keycloak
