@@ -118,6 +118,10 @@ export KEYCLOAK_ADMIN_PASSWORD=admin@xxxxxx
 sudo -E /opt/keycloak/bin/kc.sh start-dev
 ```
 
+### Verificar criação do banco de dados "keycloak"
+- Acessar o banco e verificar se o comando "start-dev" criou a estrutura do banco "keycloak".
+
+
 ### Testar Acesso
 - URL: `http://keycloak.<dominio>.com:8080/auth`
 - Usuário: `admin`
